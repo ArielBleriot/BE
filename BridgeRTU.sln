@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35312.102
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BridgeRTU", "BridgeRTU.csproj", "{72831F9D-6930-4F6B-B2D3-4F6F1CFC7141}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{72831F9D-6930-4F6B-B2D3-4F6F1CFC7141}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72831F9D-6930-4F6B-B2D3-4F6F1CFC7141}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72831F9D-6930-4F6B-B2D3-4F6F1CFC7141}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72831F9D-6930-4F6B-B2D3-4F6F1CFC7141}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {277AEFD5-AE75-4270-BC0C-3CF7032BBD1B}
+	EndGlobalSection
+EndGlobal
