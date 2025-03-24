@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using BridgeRTU.Domain;
 using BridgeRTU.Interfaces;
 using BridgeRTU.Persistance.Data;
@@ -119,7 +119,7 @@ namespace BridgeRTU.Services.Students
             return await _context.Student.Where(x => x.Id == userId).FirstOrDefaultAsync();
         }
 
-        public async Task<Tuple<int,string,string>> LoginAsync(string email, string password)
+        public async Task<Tuple<int,string,string,string,string>> LoginAsync(string email, string password)
         {
             // Step 1: Find the student by email
             var student = await _context.Student.SingleOrDefaultAsync(s => s.Email == email);
@@ -134,7 +134,7 @@ namespace BridgeRTU.Services.Students
             // Step 3: Generate JWT token if login is successful
             var token = GenerateJwtToken(student);
 
-            return new Tuple<int,string, string> (student.Id,token,student.FullName);
+            return new Tuple<int, string, string, string, string> (student.Id,token,student.FullName,student.Email,student.UniversityName);
         }
 
         private string GenerateJwtToken(Student student)
@@ -212,5 +212,42 @@ namespace BridgeRTU.Services.Students
         </html>";
         }
 
+        public async Task<List<StudentSearchResultDto>> SearchStudentsAsync(StudentSearchDto searchDto)
+        {
+            var query = _context.Student.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchDto.UniversityName))
+            {
+                query = query.Where(s => s.UniversityName.Equals(searchDto.UniversityName));
+            }
+
+            if (!string.IsNullOrEmpty(searchDto.FieldOfStudy))
+            {
+                query = query.Where(s => s.FieldOfStudy.Equals(searchDto.FieldOfStudy));
+            }
+
+            var students = await query.ToListAsync();
+
+            
+            
+            
+            if (searchDto.Interests != null && searchDto.Interests.Any())
+            {
+                students = students.Where(s => s.PersonalInterests.Any(i => searchDto.Interests.Contains(i))).ToList();
+            }
+
+            
+
+            return students.Select(s => new StudentSearchResultDto
+            {
+                Id = s.Id,
+                FullName = s.FullName,
+                UniversityName = s.UniversityName,
+                FieldOfStudy = s.FieldOfStudy,
+                Email=s.Email,
+                PersonalInterests = s.PersonalInterests
+                
+            }).ToList();
+        }
     }
 }

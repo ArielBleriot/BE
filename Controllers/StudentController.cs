@@ -1,4 +1,4 @@
-﻿// Controllers/UserController.cs
+// Controllers/UserController.cs
 using System.Net;
 using System.Net.Mail;
 using System.Security.Claims;
@@ -58,7 +58,7 @@ public class StudentController : ControllerBase
         try
         {
             var data = await _studentService.LoginAsync(model.Email, model.Password);
-            return Ok(new { StudentId=data.Item1,Token = data.Item2,FullName=data.Item3 });
+            return Ok(new { StudentId = data.Item1, Token = data.Item2, FullName = data.Item3, Email = data.Item4, UniversityName = data.Item5 });
         }
         catch (UnauthorizedAccessException)
         {
@@ -93,5 +93,19 @@ public class StudentController : ControllerBase
     {
         var result = await _studentService.RegisterForActivity(request);
         return Ok(new{ Successfull=result.Item1,Message=result.Item2});
+    }
+    [HttpPost("search")]
+    [AllowAnonymous]
+    public async Task<ActionResult<List<StudentSearchResultDto>>> SearchStudents([FromBody] StudentSearchDto searchDto)
+    {
+        try
+        {
+            var results = await _studentService.SearchStudentsAsync(searchDto);
+            return Ok(results);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "An error occurred while searching for students.");
+        }
     }
 }

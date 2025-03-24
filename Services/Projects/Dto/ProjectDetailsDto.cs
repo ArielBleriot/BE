@@ -14,9 +14,10 @@ namespace BridgeRTU.Services.Projects.Dto
         // The status of the project (e.g., 'In Progress', 'Completed')
         public string Status { get; set; }
         public List<string> Skills { get; set; }
-        public string FieldOfStudy { get; set; }
-        public List<CommentDto> Comments { get; set; }
-        public string StudentName { get; set; }
+        public List<string> Interests { get; set; }
+        public string? FieldOfStudy { get; set; }
+        public List<CommentDto>? Comments { get; set; }
+        public string? StudentName { get; set; }
     }
 
     public class ProjectDetailsDto : ProjectDto

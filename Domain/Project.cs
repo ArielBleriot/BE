@@ -14,6 +14,7 @@
         // The status of the project (e.g., 'In Progress', 'Completed')
         public string Status { get; set; }
         public List<string> Skills { get; set; }
+        public List<string> Interests { get; set; }
         public string FieldOfStudy { get; set; }
 
         // The date when the project was created
