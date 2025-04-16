@@ -100,12 +100,38 @@ public class StudentController : ControllerBase
     {
         try
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            searchDto.CurrentStudentId = int.Parse(userId);
             var results = await _studentService.SearchStudentsAsync(searchDto);
             return Ok(results);
         }
         catch (Exception ex)
         {
             return StatusCode(500, "An error occurred while searching for students.");
+        }
+    }
+    [Authorize]
+    [HttpPut("profile")]
+    public async Task<IActionResult> UpdateProfile([FromBody] StudentProfileUpdateDto profileDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var updatedProfile = await _studentService.UpdateProfileAsync(userId, profileDto);
+            return Ok(updatedProfile);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = "Internal server error", details = ex.Message });
         }
     }
 }

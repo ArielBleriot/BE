@@ -1,4 +1,4 @@
-﻿namespace BridgeRTU.Persistance.Data
+namespace BridgeRTU.Persistance.Data
 {
     using BridgeRTU.Domain;
     using Microsoft.EntityFrameworkCore;
@@ -20,6 +20,7 @@
         public DbSet<Comment> Comment { get; set; }
         public DbSet<PasswordResetToken> PasswordResetToken { get; set; }
         public DbSet<ActivityRegistration> ActivityRegistration { get; set; }
+        public DbSet<EmailVerification> EmailVerification { get; set; }
         // Optional: Configure relationships or additional configurations (Fluent API)
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

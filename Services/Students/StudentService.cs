@@ -214,7 +214,9 @@ namespace BridgeRTU.Services.Students
 
         public async Task<List<StudentSearchResultDto>> SearchStudentsAsync(StudentSearchDto searchDto)
         {
-            var query = _context.Student.AsQueryable();
+            var query = _context.Student
+                .Where(s => s.Id != searchDto.CurrentStudentId)  // Exclude current student
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchDto.UniversityName))
             {
@@ -227,16 +229,11 @@ namespace BridgeRTU.Services.Students
             }
 
             var students = await query.ToListAsync();
-
-            
-            
             
             if (searchDto.Interests != null && searchDto.Interests.Any())
             {
                 students = students.Where(s => s.PersonalInterests.Any(i => searchDto.Interests.Contains(i))).ToList();
             }
-
-            
 
             return students.Select(s => new StudentSearchResultDto
             {
@@ -244,10 +241,89 @@ namespace BridgeRTU.Services.Students
                 FullName = s.FullName,
                 UniversityName = s.UniversityName,
                 FieldOfStudy = s.FieldOfStudy,
-                Email=s.Email,
+                Email = s.Email,
                 PersonalInterests = s.PersonalInterests
-                
             }).ToList();
+        }
+
+        public async Task<bool> SendEmailVerificationCodeAsync(string email)
+        {
+            // Generate a random 6-digit code
+            var random = new Random();
+            var code = random.Next(100000, 999999).ToString();
+
+            // Create or update verification record
+            var verification = await _context.EmailVerification
+                .FirstOrDefaultAsync(v => v.Email == email);
+
+            if (verification == null)
+            {
+                verification = new EmailVerification
+                {
+                    Email = email,
+                    VerificationCode = code,
+                    CreatedAt = DateTime.UtcNow,
+                    ExpiresAt = DateTime.UtcNow.AddMinutes(15), // Code expires in 15 minutes
+                    IsVerified = false
+                };
+                _context.EmailVerification.Add(verification);
+            }
+            else
+            {
+                verification.VerificationCode = code;
+                verification.CreatedAt = DateTime.UtcNow;
+                verification.ExpiresAt = DateTime.UtcNow.AddMinutes(15);
+                verification.IsVerified = false;
+            }
+
+            await _context.SaveChangesAsync();
+
+            // Send email
+            var emailDto = new Emails.EmailDto
+            {
+                To = email,
+                Subject = "Email Verification Code",
+                Body = $"Your verification code is: {code}. This code will expire in 15 minutes."
+            };
+
+            return await _emailService.SendEmailAsync(emailDto);
+        }
+
+        public async Task<bool> VerifyEmailAsync(string email, string code)
+        {
+            var verification = await _context.EmailVerification
+                .FirstOrDefaultAsync(v => v.Email == email && v.VerificationCode == code);
+
+            if (verification == null)
+                return false;
+
+            if (verification.ExpiresAt < DateTime.UtcNow)
+                return false;
+
+            verification.IsVerified = true;
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<Student> UpdateProfileAsync(int userId, StudentProfileUpdateDto profileDto)
+        {
+            var student = await _context.Student.FindAsync(userId);
+            if (student == null)
+            {
+                throw new ArgumentException("Student not found");
+            }
+
+            // Update the student properties
+            student.FullName = profileDto.FullName;
+            student.UniversityName = profileDto.UniversityName;
+            student.FieldOfStudy = profileDto.FieldOfStudy;
+            student.PersonalInterests = profileDto.PersonalInterests;
+            student.Gender = profileDto.Gender;
+            student.DateOfBirth = profileDto.DateOfBirth;
+
+            await _context.SaveChangesAsync();
+            return student;
         }
     }
 }

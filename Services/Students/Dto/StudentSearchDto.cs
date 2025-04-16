@@ -5,6 +5,7 @@ namespace BridgeRTU.Services.Students.Dto
         public string? UniversityName { get; set; }
         public List<string>? Interests { get; set; }
         public string? FieldOfStudy { get; set; }
+        public int CurrentStudentId { get; set; }
     }
 
     public class StudentSearchResultDto
